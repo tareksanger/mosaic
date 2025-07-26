@@ -4,8 +4,8 @@ Tests for the TokenCounter abstraction.
 
 from collections import Counter
 
-from mosaic.core.llm.base import DefaultTokenCounter, TokenCounter
-from mosaic.core.llm.openai_llm import OpenAITokenCounter
+from mosaic.core.ai.llm.base import DefaultTokenCounter, TokenCounter
+from mosaic.core.ai.llm.openai_llm import OpenAITokenCounter
 
 
 class MockResponse:
