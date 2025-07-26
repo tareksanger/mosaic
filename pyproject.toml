@@ -16,6 +16,7 @@ dependencies = [
 dev = [
     "mypy>=1.17.0",
     "pre-commit>=4.2.0",
+    "pyright>=1.1.403",
     "pytest>=8.4.1",
     "ruff>=0.12.5",
 ]
@@ -83,3 +84,19 @@ section-order = ["future", "standard-library", "first-party", "local-folder", "t
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.9"
+strict = true  # Enables all recommended type checks
+plugins = []
+
+# Optional extras for clarity
+warn_unused_ignores = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+check_untyped_defs = true
