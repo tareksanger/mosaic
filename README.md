@@ -1,38 +1,78 @@
+# Mosaic
 
+A Python library for AI/ML operations with LLM and embedding support.
 
-## Development Setup
+## Quick Start
 
-This project uses [pre-commit](https://pre-commit.com/) to ensure code quality checks are automatically run before each commit.
+```python
+from mosaic.core.ai.llm import OpenAILLM
 
-### One-time setup
-
-Install the development dependencies and activate pre-commit hooks:
-
-```bash
-uv pip install --dev
-pre-commit install
+llm = OpenAILLM(api_key="your-api-key")
+response = llm.generate("Hello, world!")
+print(response.content)
 ```
 
-After this setup, all future commits will automatically run formatting and lint checks.
+## Installation
 
-## Releasing a New Version
+```bash
+pip install mosaic-mind
+```
 
-To release a new version to PyPI:
+## What is Mosaic?
+Mosaic is a Python library designed for building sophisticated multi-agent orchestration systems. It provides the foundation for creating intelligent, collaborative agents that can work together to solve complex tasks.
 
-1. Bump the version number in `pyproject.toml`:
-   ```toml
-   version = "0.x.y"
-   ```
+### Core Capabilities
 
-2. Commit the change:
-   ```bash
-   git commit -am "Bump version to 0.x.y"
-   ```
+- **Multi-Agent Orchestration**: Coordinate multiple specialized agents to work together
+- **Intelligent Task Distribution**: Automatically assign and route tasks to appropriate agents
+- **Agent Communication**: Enable agents to communicate, share information, and collaborate
+- **Workflow Automation**: Define and execute complex multi-step workflows
+- **AI Integration**: Seamless integration with various LLM providers (OpenAI, Google Gemini)
+- **Embedding Support**: Vector-based knowledge representation and retrieval
 
-3. Tag the release and push:
-   ```bash
-   git tag v0.x.y
-   git push origin v0.x.y
-   ```
+### Key Features
 
-This will trigger the GitHub Actions workflow to build and publish the package to PyPI using `uv publish`.
+- **Modular Agent Architecture**: Create specialized agents for different tasks
+- **Dynamic Task Routing**: Intelligent task assignment based on agent capabilities
+- **State Management**: Track and manage agent states and conversation history
+- **Error Recovery**: Built-in retry logic and error handling for robust operation
+- **Extensible Design**: Easy to add new agent types and orchestration patterns
+
+## Documentation
+
+- [📚 Full Documentation](docs/) - Complete API reference and guides
+- [🚀 Getting Started](docs/getting-started.md) - Installation and basic usage
+- [🔧 Contributing](CONTRIBUTING.md) - Development setup and guidelines
+
+## Quick Examples
+
+### Text Generation
+```python
+from mosaic.core.ai.llm import OpenAILLM
+
+llm = OpenAILLM(api_key="your-api-key")
+response = llm.generate("Explain quantum computing in simple terms")
+print(response.content)
+```
+
+### Embeddings
+```python
+from mosaic.core.ai.embedding import OpenAIEmbedding
+
+embedding = OpenAIEmbedding(api_key="your-api-key")
+embeddings = embedding.embed(["Hello world", "Goodbye world"])
+print(embeddings[0][:5])  # First 5 dimensions
+```
+
+### Token Counting
+```python
+from mosaic.core.ai.llm import OpenAILLM
+
+llm = OpenAILLM(api_key="your-api-key")
+response = llm.generate("Count the tokens in this text")
+print(f"Tokens used: {response.usage.total_tokens}")
+```
+
+## License
+
+MIT License - see LICENSE file for details.MIT License - see LICENSE file for details.

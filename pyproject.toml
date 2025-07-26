@@ -1,6 +1,6 @@
 [project]
 name = "mosaic-mind"
-version = "0.0.1-alpha.1"
+version = "0.0.1-alpha.2"
 description = "Add your description here"
 readme = "README.md"
 license = { text = "MIT" }
@@ -24,6 +24,9 @@ all = ["sentence-transformers>=2.2.0"]
 
 [dependency-groups]
 dev = [
+    "ipykernel>=6.30.0",
+    "ipython-ngql>=0.14.3",
+    "jupyter>=1.1.1",
     "mypy>=1.17.0",
     "pre-commit>=4.2.0",
     "pyright>=1.1.403",
@@ -90,38 +93,3 @@ section-order = ["future", "standard-library", "first-party", "local-folder", "t
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-
-
-# MyPy configuration
-[tool.mypy]
-python_version = "3.9"
-strict = true  # Enables all recommended type checks
-plugins = []
-
-# Optional extras for clarity
-warn_unused_ignores = true
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-disallow_untyped_calls = true
-check_untyped_defs = true
-
-# Pytest configuration
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = [
-    "-v",
-    "--tb=short",
-    "--strict-markers",
-    "--disable-warnings",
-]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-]
-
