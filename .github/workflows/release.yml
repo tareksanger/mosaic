@@ -2,14 +2,20 @@ name: Release
 
 on:
   push:
-    tags: ["v*.*.*"]
     branches: [main-123]
 
 jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+    with:
+      python-version: '3.11'
+      run-tests: true
+
   release:
     name: Release to PyPI
     runs-on: ubuntu-latest
     environment: pypi
+    needs: test
     steps:
       - name: Checkout
         uses: actions/checkout@v4

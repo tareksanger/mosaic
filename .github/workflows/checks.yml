@@ -1,0 +1,12 @@
+name: PR Checks
+
+on: 
+  pull_request:
+    types: [opened, edited, reopened]
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+    with:
+      python-version: '3.9'
+      run-tests: true
