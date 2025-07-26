@@ -77,7 +77,7 @@ max-complexity = 10
 
 [tool.ruff.lint.isort]
 force-single-line = false
-known-first-party = ["aucctus"]
+known-first-party = ["mosaic"]
 combine-as-imports = true
 force-sort-within-sections = true
 order-by-type = false
