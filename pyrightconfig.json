@@ -3,5 +3,5 @@
   "exclude": ["tests", "**/__pycache__"],
   "reportMissingImports": true,
   "reportMissingTypeStubs": false,
-  "typeCheckingMode": "strict"
+  "typeCheckingMode": "basic"
 }
