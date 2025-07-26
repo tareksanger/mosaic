@@ -2,11 +2,15 @@ from abc import ABC, abstractmethod
 from collections import Counter
 from inspect import iscoroutinefunction
 import logging
-from typing import Callable, Optional, TypeVar
+from typing import Callable, Optional, Type, TypeVar
 
 from mosaic.core.common.logger_mixin import LoggerMixin
 
+from pydantic import BaseModel
+
 T = TypeVar("T")
+
+S = TypeVar("S", bound=BaseModel)
 
 
 class TokenCounter(ABC):
@@ -107,6 +111,13 @@ class BaseLLM(LoggerMixin, ABC):
     @property
     def verbose(self) -> bool:
         return self._verbose
+
+    @abstractmethod
+    async def generate(self, prompt: str, output_format: Optional[Type[S]] = None) -> S:
+        """
+        Generate a response from the LLM.
+        """
+        pass
 
     def _initialize_default_middlewares(self):
         """

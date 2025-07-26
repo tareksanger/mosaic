@@ -16,7 +16,7 @@ from typing import (
     Union,
 )
 
-from mosaic.core.ai.llm.base import BaseLLM, TokenCounter
+from mosaic.core.ai.llm.base import BaseLLM, S, TokenCounter
 
 import httpx
 from httpx import TimeoutException
@@ -125,6 +125,24 @@ class OpenAILLM(BaseLLM):
     @property
     def client(self) -> AsyncOpenAI:
         return self.__client
+
+    @overload
+    async def generate(self, prompt: str, output_format: Optional[Type[S]] = None) -> Union[str, None]: ...
+
+    @overload
+    async def generate(self, prompt: str, output_format: Type[S]) -> Union[S, None]: ...
+
+    async def generate(self, prompt: str, output_format: Optional[Type[S]] = None) -> Union[str, S, None]:
+        if output_format is None:
+            response = await self.completion(messages=[{"role": "user", "content": prompt}])
+            if content := response.get("content"):
+                return str(content)
+        else:
+            response = await self.structured_completion(output_format, messages=[{"role": "user", "content": prompt}])
+            if response.parsed:
+                return response.parsed
+
+        return None
 
     @overload
     async def completion(
@@ -283,18 +301,9 @@ class OpenAILLM(BaseLLM):
                 return [choice.message for choice in completion.choices]  # type: ignore
             return completion.choices[0].message  # type: ignore
 
-        except TimeoutException as te:
-            self.exception(te, level=logging.ERROR)
-            raise te
-        except httpx.RequestError as re:
-            self.exception(re, level=logging.ERROR)
-            raise re
-        except json.JSONDecodeError as je:
-            self.exception(je, level=logging.ERROR)
-            raise je
-        except Exception as e:
+        except (TimeoutException, httpx.RequestError, json.JSONDecodeError, Exception) as e:
             self.exception(e, level=logging.ERROR)
-            raise e
+            raise
 
     @retry(
         stop=stop_after_attempt(5),
@@ -325,11 +334,11 @@ class OpenAILLM(BaseLLM):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | Timeout | NotGiven | None = NOT_GIVEN,
-    ):
+    ) -> Response:
         self.logger.debug(f"Starting response with model={model}, input_type={type(input)}")
 
         try:
-            response = await self.client.responses.create(
+            response: Response = await self.client.responses.create(
                 input=input,
                 model=model,
                 include=include,
@@ -359,9 +368,9 @@ class OpenAILLM(BaseLLM):
 
             return await self._apply_middlewares(response)
 
-        except Exception as e:
+        except (TimeoutException, httpx.RequestError, json.JSONDecodeError, Exception) as e:
             self.exception(e, level=logging.ERROR)
-            raise e
+            raise
 
     @retry(
         stop=stop_after_attempt(5),
@@ -464,18 +473,9 @@ class OpenAILLM(BaseLLM):
                     yield accumulated_content, "done"
 
             return stream_manager()
-        except TimeoutException as te:
-            self.exception(te, level=logging.ERROR)
-            raise te
-        except httpx.RequestError as re:
-            self.exception(re, level=logging.ERROR)
-            raise re
-        except json.JSONDecodeError as je:
-            self.exception(je, level=logging.ERROR)
-            raise je
-        except Exception as e:
+        except (TimeoutException, httpx.RequestError, json.JSONDecodeError, Exception) as e:
             self.exception(e, level=logging.ERROR)
-            raise e
+            raise
 
     @retry(
         stop=stop_after_attempt(5),
@@ -586,18 +586,9 @@ class OpenAILLM(BaseLLM):
             # Return the stream generator
             return stream_generator()
 
-        except TimeoutException as te:
-            self.exception(te, level=logging.ERROR)
-            raise te
-        except httpx.RequestError as re:
-            self.exception(re, level=logging.ERROR)
-            raise re
-        except json.JSONDecodeError as je:
-            self.exception(je, level=logging.ERROR)
-            raise je
-        except Exception as e:
+        except (TimeoutException, httpx.RequestError, json.JSONDecodeError, Exception) as e:
             self.exception(e, level=logging.ERROR)
-            raise e
+            raise
 
     @overload
     async def structured_completion(
@@ -767,18 +758,9 @@ class OpenAILLM(BaseLLM):
                 return [choice.message for choice in completion.choices]
             return completion.choices[0].message
 
-        except TimeoutException as te:
-            self.exception(te, level=logging.ERROR)
-            raise te
-        except httpx.RequestError as re:
-            self.exception(re, level=logging.ERROR)
-            raise re
-        except json.JSONDecodeError as je:
-            self.exception(je, level=logging.ERROR)
-            raise je
-        except Exception as e:
+        except (TimeoutException, httpx.RequestError, json.JSONDecodeError, Exception) as e:
             self.exception(e, level=logging.ERROR)
-            raise e
+            raise
 
     @retry(stop=stop_after_attempt(5), reraise=True)
     async def generate_image(
@@ -829,18 +811,9 @@ class OpenAILLM(BaseLLM):
             )
             self.logger.debug("Received response from image generation API")
             return response
-        except TimeoutException as te:
-            self.exception(te, level=logging.ERROR)
-            raise te
-        except httpx.RequestError as re:
-            self.exception(re, level=logging.ERROR)
-            raise re
-        except json.JSONDecodeError as je:
-            self.exception(je, level=logging.ERROR)
-            raise je
-        except Exception as e:
+        except (TimeoutException, httpx.RequestError, json.JSONDecodeError, Exception) as e:
             self.exception(e, level=logging.ERROR)
-            raise e
+            raise
 
     def confidence_score(self, top_logprob: TopLogprob) -> float:
         """

@@ -2,9 +2,9 @@ from collections import Counter
 from dataclasses import dataclass, field
 import logging
 import os
-from typing import Optional, TypeVar, Union
+from typing import Optional, overload, Type, TypeVar, Union
 
-from mosaic.core.ai.llm.base import BaseLLM, TokenCounter
+from mosaic.core.ai.llm.base import BaseLLM, S, TokenCounter
 from mosaic.core.common.utils.pydantic import merge_pydantic_models
 
 from google import genai
@@ -159,6 +159,15 @@ class GeminiLLM(BaseLLM):
     def google_search_tool(self) -> Tool:
         """Get the cached Google search tool."""
         return self._google_search_tool
+
+    @overload
+    async def generate(self, prompt: str, output_format: Optional[Type[S]] = None) -> Union[str, None]: ...
+
+    @overload
+    async def generate(self, prompt: str, output_format: Type[S]) -> Union[S, None]: ...
+
+    async def generate(self, prompt: str, output_format: Optional[Type[S]] = None) -> Union[str, S, None]:
+        raise NotImplementedError("Gemini LLM does not support structured output yet")
 
     @retry(
         stop=stop_after_attempt(5),
