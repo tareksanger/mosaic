@@ -3,12 +3,13 @@ name: Release
 on:
   push:
     tags: ["v*.*.*"]
-    branches: [main]
+    branches: [main-123]
 
 jobs:
   release:
     name: Release to PyPI
     runs-on: ubuntu-latest
+    environment: pypi
     steps:
       - name: Checkout
         uses: actions/checkout@v4
