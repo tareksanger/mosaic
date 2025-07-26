@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
 """
-Simple test to demonstrate the new TokenCounter abstraction.
+Tests for the TokenCounter abstraction.
 """
 
-import asyncio
 from collections import Counter
 
 from mosaic.core.llm.base import DefaultTokenCounter, TokenCounter
@@ -31,7 +29,6 @@ class MockUsage:
 
 def test_default_token_counter():
     """Test the default token counter."""
-    print("Testing DefaultTokenCounter...")
     counter = DefaultTokenCounter()
 
     # Test that it doesn't crash
@@ -42,12 +39,9 @@ def test_default_token_counter():
     # Test token count is empty
     assert counter.get_token_count() == Counter()
 
-    print("✅ DefaultTokenCounter works correctly")
-
 
 def test_openai_token_counter():
     """Test the OpenAI token counter."""
-    print("Testing OpenAITokenCounter behavior...")
     counter = OpenAITokenCounter()
 
     # First response
@@ -86,12 +80,9 @@ def test_openai_token_counter():
     assert token_count["completion_tokens"] == 55  # 15 + 30 + 10
     assert token_count["total_tokens"] == 90  # 25 + 50 + 15
 
-    print("✅ OpenAITokenCounter properly stacks token counts across multiple responses")
-
 
 def test_base_llm_with_token_counter():
     """Test BaseLLM with custom token counter."""
-    print("Testing BaseLLM with TokenCounter...")
 
     # Create a custom token counter
     class CustomTokenCounter(TokenCounter):
@@ -122,13 +113,9 @@ def test_base_llm_with_token_counter():
     assert result == response
     assert custom_counter.get_token_count()["total_responses"] == 1
 
-    print("✅ BaseLLM TokenCounter integration works correctly")
-
 
 def test_token_counter_reset():
     """Test token counter reset functionality."""
-    print("Testing TokenCounter reset...")
-
     counter = OpenAITokenCounter()
 
     # Add some tokens
@@ -143,20 +130,21 @@ def test_token_counter_reset():
     counter.reset_token_count()
     assert counter.get_token_count() == Counter()
 
-    print("✅ TokenCounter reset works correctly")
 
+def test_token_counter_error_handling():
+    """Test that token counter handles errors gracefully."""
+    counter = OpenAITokenCounter()
 
-async def main():
-    """Run all tests."""
-    print("🧪 Testing TokenCounter abstraction...\n")
+    # Test with response that has no usage data
+    response_no_usage = MockResponse(None)
+    result = counter.count_tokens(response_no_usage)  # type: ignore
+    assert result == response_no_usage
 
-    test_default_token_counter()
-    test_openai_token_counter()
-    test_base_llm_with_token_counter()
-    test_token_counter_reset()
+    # Test with response that has invalid usage data
+    class MockInvalidUsage:
+        def model_dump(self, exclude_none=True):
+            raise Exception("Invalid usage data")
 
-    print("\n🎉 All tests passed!")
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+    response_invalid = MockResponse(MockInvalidUsage())
+    result = counter.count_tokens(response_invalid)  # type: ignore
+    assert result == response_invalid
