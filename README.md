@@ -61,7 +61,7 @@ from mosaic.core.ai.embedding import OpenAIEmbedding
 
 embedding = OpenAIEmbedding(api_key="your-api-key")
 embeddings = embedding.embed(["Hello world", "Goodbye world"])
-print(embeddings[0][:5])  # First 5 dimensions
+print(embeddings)
 ```
 
 ### Token Counting
@@ -69,7 +69,7 @@ print(embeddings[0][:5])  # First 5 dimensions
 from mosaic.core.ai.llm import OpenAILLM
 
 llm = OpenAILLM(api_key="your-api-key")
-response = llm.generate("Count the tokens in this text")
+response = await llm.response("Count the tokens in this text")
 print(f"Tokens used: {response.usage.total_tokens}")
 ```
 

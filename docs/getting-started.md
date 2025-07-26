@@ -22,14 +22,6 @@ For all optional dependencies:
 pip install mosaic-mind[all]
 ```
 
-### From Source
-
-```bash
-git clone https://github.com/yourusername/mosaic-mind.git
-cd mosaic-mind
-pip install -e .
-```
-
 ## Quick Start
 
 ### 1. Set Up API Keys
