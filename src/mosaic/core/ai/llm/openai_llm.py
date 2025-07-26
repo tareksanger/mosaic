@@ -16,7 +16,7 @@ from typing import (
     Union,
 )
 
-from mosaic.core.llm.base import BaseLLM, TokenCounter
+from mosaic.core.ai.llm.base import BaseLLM, TokenCounter
 
 import httpx
 from httpx import TimeoutException

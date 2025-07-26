@@ -4,8 +4,8 @@ import logging
 import os
 from typing import Optional, TypeVar, Union
 
+from mosaic.core.ai.llm.base import BaseLLM, TokenCounter
 from mosaic.core.common.utils.pydantic import merge_pydantic_models
-from mosaic.core.llm.base import BaseLLM, TokenCounter
 
 from google import genai
 from google.genai.errors import ClientError, ServerError
@@ -24,7 +24,7 @@ from google.genai.types import (
     Tool,
 )
 import httpx
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from tenacity import (
     retry,
     retry_if_not_exception_type,

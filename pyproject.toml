@@ -18,6 +18,10 @@ dependencies = [
     "tenacity>=9.1.2",
 ]
 
+[project.optional-dependencies]
+sentence-transformers = ["sentence-transformers>=2.2.0"]
+all = ["sentence-transformers>=2.2.0"]
+
 [dependency-groups]
 dev = [
     "mypy>=1.17.0",
@@ -27,11 +31,6 @@ dev = [
     "pytest-asyncio>=1.1.0",
     "ruff>=0.12.5",
 ]
-
-# [project.optional-dependencies]
-# fastapi = ["fastapi", "uvicorn[standard]"]
-# django = ["django"]
-# all = ["fastapi", "uvicorn[standard]", "django"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mosaic"]
