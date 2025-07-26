@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 import json
 import logging
 import os
@@ -15,7 +16,7 @@ from typing import (
     Union,
 )
 
-from mosaic.core.llm.base import BaseLLM
+from mosaic.core.llm.base import BaseLLM, TokenCounter
 
 import httpx
 from httpx import TimeoutException
@@ -62,34 +63,24 @@ REASONING_MODEL: ChatModel = cast(ChatModel, os.getenv("OPENAI_REASONING_MODEL",
 IMAGE_MODEL: Union[str, ImageModel] = cast(Union[str, ImageModel], os.getenv("OPENAI_IMAGE_MODEL", "gpt-4o-mini"))
 
 
-class OpenAILLM(BaseLLM):
-    def __init__(
-        self,
-        client: Optional[AsyncOpenAI] = None,
-        verbose: bool = False,
-        logger: Optional[logging.Logger] = None,
-    ):
-        # Initialize BaseLLM first
-        super().__init__(verbose=verbose, logger=logger)
+class OpenAITokenCounter(TokenCounter):
+    """
+    Token counter implementation for OpenAI API responses.
+    Extracts token usage information from OpenAI completion objects.
+    """
 
-        if client is None:
-            client = AsyncOpenAI()
+    def __init__(self):
+        self._token_count = Counter()
 
-        self.__client = client
-
-    @property
-    def client(self) -> AsyncOpenAI:
-        return self.__client
-
-    def _count_tokens(self, completion: Completion | Response):
+    def count_tokens(self, completion: Completion | Response) -> Completion | Response:
         """
         Counts the tokens in the completion.
 
         Args:
-            completion (Completion): The completion to count the tokens of.
+            completion (Completion | Response): The completion to count the tokens of.
 
         Returns:
-            Completion: The completion with the token count.
+            Completion | Response: The completion with the token count.
         """
         try:
             if usage := completion.usage:
@@ -103,10 +94,37 @@ class OpenAILLM(BaseLLM):
                     self._token_count.update(completion_details)
                 if prompt_details:
                     self._token_count.update(prompt_details)
-                self.logger.debug(f"Updated token count: {self._token_count}")
         except Exception as e:
-            self.exception(e, level=logging.ERROR)
+            # Log error but don't fail the request
+            logging.getLogger(__name__).error(f"Error counting tokens: {e}")
+
         return completion
+
+    def get_token_count(self) -> Counter:
+        return self._token_count
+
+    def reset_token_count(self) -> None:
+        self._token_count.clear()
+
+
+class OpenAILLM(BaseLLM):
+    def __init__(
+        self,
+        client: Optional[AsyncOpenAI] = None,
+        verbose: bool = False,
+        logger: Optional[logging.Logger] = None,
+    ):
+        # Initialize BaseLLM with OpenAI-specific token counter
+        super().__init__(token_counter=OpenAITokenCounter(), verbose=verbose, logger=logger)
+
+        if client is None:
+            client = AsyncOpenAI()
+
+        self.__client = client
+
+    @property
+    def client(self) -> AsyncOpenAI:
+        return self.__client
 
     @overload
     async def completion(
